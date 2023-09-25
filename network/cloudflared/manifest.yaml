@@ -1,0 +1,10 @@
+version: v1alpha1
+metadata:
+  name: cloudflared
+  version: "$VERSION"
+  author: Joel Cressy
+  description: |
+    CloudflareD is the Cloudflare Tunnel Client (formerly Argo Tunnel)
+  compatibility:
+    talos:
+      version: ">= v1.5.0"

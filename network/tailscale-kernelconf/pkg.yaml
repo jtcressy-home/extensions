@@ -1,0 +1,30 @@
+name: tailscale-kernelconf
+variant: scratch
+shell: /toolchain/bin/bash
+dependencies:
+  - stage: base
+steps:
+  - env:
+      GOPATH: /go
+    prepare:
+      - |
+        sed -i 's#$VERSION#{{ .VERSION }}#' /pkg/manifest.yaml
+    build:
+      - |
+        export PATH=${PATH}:${TOOLCHAIN}/go/bin
+
+        cd /pkg/src
+        CGO_ENABLED=0 go build -o ./tailscale-kernelconf .
+    install:
+      - |
+        mkdir -p /rootfs/usr/local/etc/containers
+        mkdir -p /rootfs/usr/local/lib/containers/tailscale-kernelconf
+
+        cp -p /pkg/src/tailscale-kernelconf /rootfs/usr/local/lib/containers/tailscale-kernelconf/
+finalize:
+  - from: /rootfs
+    to: /rootfs
+  - from: /pkg/manifest.yaml
+    to: /
+  - from: /pkg/tailscale-kernelconf.yaml
+    to: /rootfs/usr/local/etc/containers/

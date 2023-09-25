@@ -1,0 +1,41 @@
+name: cloudflared
+variant: scratch
+shell: /toolchain/bin/bash
+dependencies:
+  - stage: base
+steps:
+  - env:
+      GOPATH: /go
+  - sources:
+      - url: https://github.com/cloudflare/cloudflared/archive/refs/tags/{{ .CLOUDFLARED_VERSION }}.tar.gz
+        destination: cloudflared.tar.gz
+    prepare:
+      - |
+        sed -i 's#$VERSION#{{ .VERSION }}#' /pkg/manifest.yaml
+
+      - |
+        mkdir cloudflared dist
+        tar -xzvf cloudflared.tar.gz --strip-components=1 -C cloudflared
+    build:
+      - |
+        export PATH=${PATH}:${TOOLCHAIN}/go/bin
+
+        go build \
+          -C cloudflared \
+          -o ../dist \
+        	-ldflags "-X main.Version={{ .CLOUDFLARED_VERSION }} \
+         					  -X main.BuildTime=$(date -u '+%Y-%m-%d-%H%M UTC') \
+                    -X github.com/cloudflare/cloudflared/cmd/cloudflared/updater.BuiltForPackageManager=talos-ext " \
+         github.com/cloudflare/cloudflared/cmd/cloudflared
+    install:
+      - |
+        mkdir -p /rootfs/usr/local/lib/containers/cloudflared/usr/local/bin/
+        cp -pr dist/cloudflared /rootfs/usr/local/lib/containers/cloudflared/usr/local/bin
+
+finalize:
+  - from: /rootfs
+    to: /rootfs
+  - from: /pkg/manifest.yaml
+    to: /
+  - from: /pkg/cloudflared.yaml
+    to: /rootfs/usr/local/etc/containers/

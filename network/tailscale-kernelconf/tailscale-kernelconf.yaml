@@ -1,0 +1,33 @@
+name: tailscale-kernelconf
+depends:
+  - service: 
+    - cri
+    - tailscale
+  - network:
+    - addresses
+    - connectivity
+    - etcfiles
+container:
+  entrypoint: ./tailscale-kernelconf
+  environment:
+  - PATH=/sbin:/usr/local/bin
+  - TS_ENV_FILE=/var/etc/tailscale/auth.env
+  security:
+    writeableRootfs: false
+    writeableSysfs: true
+  mounts:
+  # tailscale-kernelconf needs to read /proc/cmdline
+  - source: /proc
+    destination: /proc
+    type: bind
+    options:
+      - bind
+      - ro
+  # tailscale-kernelconf needs to write /var/etc/tailscale/auth.env
+  - source: /var/etc/tailscale
+    destination: /var/etc/tailscale
+    type: bind
+    options:
+      - bind
+      - rw
+restart: always

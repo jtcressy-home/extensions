@@ -1,0 +1,10 @@
+version: v1alpha1
+metadata:
+  name: tailscale-kernelconf
+  version: "$VERSION"
+  author: Joel Cressy
+  description: |
+    tailscale-kernelconf uses /proc/cmdline to configure the tailscale extension service for talos.
+  compatibility:
+    talos:
+      version: ">= v1.5.0"

@@ -1,2 +1,5 @@
 # renovate: datasource=github-releases extractVersion=^v(?<version>.*)$ depName=tailscale/tailscale
 TAILSCALE_VERSION: 1.50.0
+
+# renovate: datasource=github-releases extractVersion=^(?<version>.*)$ depName=cloudflare/cloudflared
+CLOUDFLARED_VERSION: "2023.8.2"

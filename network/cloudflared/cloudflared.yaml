@@ -1,0 +1,48 @@
+name: cloudflared
+depends:
+  - service: cri
+  - network:
+    - addresses
+    - connectivity
+    - etcfiles
+container:
+  entrypoint: /usr/local/bin/cloudflared
+  args:
+  - tunnel
+  - run
+  environmentFile: /var/etc/cloudflared/env
+  environment:
+  - PATH=/sbin:/usr/local/bin
+  - NO_AUTOUPDATE=true
+  security:
+    writeableRootfs: false
+    writeableSysfs: true
+  mounts:
+  # libs
+  - source: /lib
+    destination: /lib
+    type: bind
+    options:
+      - bind
+      - ro
+  # more libs
+  - source: /usr/lib
+    destination: /usr/lib
+    type: bind
+    options:
+      - bind
+      - ro
+  - source: /sbin
+    destination: /sbin
+    type: bind
+    options:
+      - bind
+      - ro
+  ## CloudflareD config directory
+  - source: /var/etc/cloudflared
+    destination: /var/etc/cloudflared
+    type: bind
+    options:
+      - bind
+      - ro
+restart: always
